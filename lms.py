@@ -7,7 +7,7 @@ import socket
 from datetime import timedelta
 from sys import version_info, argv
 
-if version_info < (3,0):
+if version_info < (3, 0):
     exit('Python 3 required')
 
 __version__ = '0.0.2'
@@ -35,7 +35,7 @@ def _discover():
                     if not data.startswith(response):
                         continue
                     length = data[5:6][0]
-                    port = int(data[0-length:])
+                    port = int(data[0 - length:])
                     return ip, port
                 except socket.timeout:
                     break
@@ -55,20 +55,21 @@ class Server:
             host, port = _discover()
             if not host:
                 exit('Could not initialize server')
-            _LOGGER.info('Server at %s:%d discovered', host, port) 
+            _LOGGER.info('Server at %s:%d discovered', host, port)
         self._host = host
         self._port = port
         self._session = Session()
         self._username = username
         self._password = password
+        self._state = {}
         if username and password:
             self._session.auth = (username, password)
-        
+
     def __str__(self):
         return '%s:%d (%s)' % (
             self._host, self._port, self.version) + '\n' + '\n'.join(
                 ' - ' + str(p) for p in self.players)
-        
+
     def query(self, *command, player=''):
         url = 'http://{}:{}/jsonrpc.js'.format(self._host, self._port)
         data = {
@@ -110,16 +111,17 @@ class Server:
     @property
     def version(self):
         return self._state.get('version')
-    
+
     @property
     def players(self):
         return self._players.values()
-    
+
     def player(self, player_id):
         return self._players[player_id]
-    
+
 
 class Player:
+
     def __init__(self, server, player):
         self._server = server
         self._state = player
@@ -128,7 +130,7 @@ class Player:
         return '%s (%s:%s:%d%%): %s - %s' % (
             self.name, self.model, self.ip, self.wifi_signal_strength,
             self.artist or '', self.title)
-        
+
     @property
     def player_id(self):
         return self._state['playerid']
@@ -136,29 +138,29 @@ class Player:
     @property
     def is_synced(self):
         return 'sync_master' in self._state
-    
+
     def sync_to(self, other):
         self.query('sync', other.player_id)
 
     def unsync(self):
         self.query('sync', '-')
-                             
+
     @property
     def name(self):
         return self._state['name']
-                
+
     @property
     def ip(self):
         return self._state.get('player_ip')
-    
+
     @property
     def model(self):
         return self._state['modelname']
-    
+
     @property
     def is_on(self):
         return self._state.get('power') == 1
-    
+
     @property
     def is_playing(self):
         return self._state.get('mode') == 'play'
@@ -178,7 +180,7 @@ class Player:
     @property
     def is_repeat(self):
         return self._state.get('playlist_repeat') == 1
-   
+
     def query(self, *params):
         return self._server.query(*params, player=self.player_id)
 
@@ -207,10 +209,10 @@ class Player:
     @property
     def track_id(self):
         return self._state['id']
-        
+
     @property
     def volume_level(self):
-         if 'mixer volume' in self._state:
+        if 'mixer volume' in self._state:
             return int(self._state['mixer volume'])
 
     @property
@@ -236,9 +238,9 @@ class Player:
                 track_id=self._state['id'])
         else:
             url = '/music/current/cover.jpg?player={player}'.format(
-            player=self.player_id)
+                player=self.player_id)
         return urljoin(self._server.url, url)
-    
+
     @property
     def title(self):
         return self._state.get('title') or self._state.get('current_title')
@@ -269,23 +271,23 @@ class Player:
     def pause(self):
         return self.query('pause', '1')
 
-    def nextk(self):
+    def next(self):
         return self.query('playlist', 'index', '+1')
 
     def previous(self):
         return self.query('playlist', 'index', '-1')
 
     def seek(self, position):
-         return self.query('time', position)
+        return self.query('time', position)
 
     def turn_off(self):
         return self.query('power', '0')
-    
+
     def turn_on(self):
         return self.query('power', '1')
 
     def play(self, uri):
-         return self.query('playlist', 'play', url)
+        return self.query('playlist', 'play', url)
 
     def enqueue(self, uri):
         return self.query('playlist', 'add', url)
@@ -293,7 +295,7 @@ class Player:
     @property
     def wifi_signal_strength(self):
         return self._state.get('signalstrength')
-    
+
 if __name__ == '__main__':
     if '-vv' in argv:
         logging.basicConfig(level=logging.DEBUG)

@@ -13,6 +13,7 @@ if version_info < (3, 0):
 __version__ = '0.0.6'
 
 _LOGGER = logging.getLogger(__name__)
+TIMEOUT = timedelta(seconds=5)
 
 
 def _discover():
@@ -21,7 +22,7 @@ def _discover():
     port = 3483
     query = b'eJSON\0'
     response = b'EJSON'
-    timeout = timedelta(seconds=5)
+    timeout = TIMEOUT
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -82,7 +83,8 @@ class Server:
         }
         _LOGGER.debug('URL: %s Data: %s', url, data)
         try:
-            result = self._session.post(url, json=data)
+            result = self._session.post(
+                url, json=data, timeout=TIMEOUT.seconds)
             result.raise_for_status()
             result = result.json()
             _LOGGER.debug(result)

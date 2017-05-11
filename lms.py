@@ -247,7 +247,7 @@ class Player:
         else:
             url = '/music/current/cover.jpg?player={player}'.format(
                 player=self.player_id)
-        return urljoin(self._server.url, url)
+        return urljoin(self._server._url, url)
 
     @property
     def title(self):

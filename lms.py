@@ -62,6 +62,7 @@ class Server:
         self._username = username
         self._password = password
         self._state = {}
+        self._players = []
         if username and password:
             self._session.auth = (username, password)
 

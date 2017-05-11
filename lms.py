@@ -96,6 +96,9 @@ class Server:
         data = self.query('players', 'status')
         self._players = {player['playerid']: Player(self, player)
                          for player in data['players_loop']}
+        self.update_players()
+
+    def update_players(self):
         for player in self.players:
             player.update()
 

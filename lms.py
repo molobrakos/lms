@@ -225,7 +225,7 @@ class Player:
 
     @property
     def is_muted(self):
-        return self._state.get('mixer volume', '').startswith('-')
+        return str(self._state.get('mixer volume', '')).startswith('-')
 
     @property
     def position(self):

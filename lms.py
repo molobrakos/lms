@@ -10,7 +10,7 @@ from sys import version_info, argv
 if version_info < (3,0):
     exit('Python 3 required')
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -1,7 +1,5 @@
 Python interface with the squeezebox server using json-rpc
 
-Python interface with the squeezebox server using json-rpc
-
 ```
 from lms import find_server
 server = find_server()

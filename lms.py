@@ -45,7 +45,9 @@ def _discover():
 
 
 def find_server():
-    return Server()
+    server = Server()
+    server.update()
+    return server
 
 
 class Server:
@@ -62,7 +64,7 @@ class Server:
         self._username = username
         self._password = password
         self._state = {}
-        self._players = []
+        self._players = {}
         if username and password:
             self._session.auth = (username, password)
 
@@ -303,5 +305,4 @@ if __name__ == '__main__':
     elif '-v' in argv:
         logging.basicConfig(level=logging.INFO)
     server = find_server()
-    server.update()
     print(server)

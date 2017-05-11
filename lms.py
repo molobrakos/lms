@@ -219,7 +219,7 @@ class Player:
         return self._state['id']
 
     @property
-    def volume_level(self):
+    def volume(self):
         if 'mixer volume' in self._state:
             return int(self._state['mixer volume'])
 
@@ -294,10 +294,10 @@ class Player:
     def turn_on(self):
         return self.query('power', '1')
 
-    def play(self, uri):
+    def play_uri(self, uri):
         return self.query('playlist', 'play', url)
 
-    def enqueue(self, uri):
+    def enqueue_uri(self, uri):
         return self.query('playlist', 'add', url)
 
     @property

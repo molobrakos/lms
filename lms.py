@@ -304,7 +304,7 @@ class Player:
 
     @property
     def wifi_signal_strength(self):
-        return self._state.get('signalstrength')
+        return int(self._state.get('signalstrength'))
 
 if __name__ == '__main__':
     if '-vv' in argv:

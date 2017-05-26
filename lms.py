@@ -95,7 +95,7 @@ class Server:
         self._state = self.query('serverstatus')
         data = self.query('players', 'status')
         self._players = {player['playerid']: Player(self, player)
-                         for player in data['players_loop']}
+                         for player in data.get('players_loop', [])}
         self.update_players()
 
     def update_players(self):
@@ -168,16 +168,20 @@ class Player:
         return self._state.get('power') == 1
 
     @property
+    def mode(self):
+        return self._state.get('mode')
+
+    @property
     def is_playing(self):
-        return self._state.get('mode') == 'play'
+        return self.mode == 'play'
 
     @property
     def is_stopped(self):
-        return self._state.get('mode') == 'stop'
+        return self.mode == 'stop'
 
     @property
     def is_paused(self):
-        return self._state.get('mode') == 'pause'
+        return self.mode == 'pause'
 
     @property
     def is_shuffle(self):

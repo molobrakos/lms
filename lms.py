@@ -76,11 +76,9 @@ class Server:
 
     def query(self, *command, player=''):
         url = 'http://{}:{}/jsonrpc.js'.format(self._host, self._port)
-        data = {
-            'id': '1',
-            'method': 'slim.request',
-            'params': [player, command]
-        }
+        data = dict(id='1',
+                    method='slim.request',
+                    params=[player, command])
         _LOGGER.debug('URL: %s Data: %s', url, data)
         try:
             result = self._session.post(

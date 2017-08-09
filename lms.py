@@ -133,9 +133,18 @@ class Player:
         self._state = player
 
     def __str__(self):
-        return '%s (%s:%s:%d%%): %s - %s' % (
+
+        def timeFmt(s):
+            h, r = divmod(s, 3600)
+            m, s = divmod(r, 60)
+            return '%s%02d.%02d' % ('' if not h else '%02d:' % h, m, s)
+
+        return '%s (%s:%s:%d%%): %s - %s (%3d%%: %s / %s)' % (
             self.name, self.model, self.ip, self.wifi_signal_strength,
-            self.artist or '', self.title)
+            self.artist or '', self.title,
+            self.position / self.duration if self.duration else 0,
+            timeFmt(self.position),
+            timeFmt(self.duration) if self.duration else '?')
 
     @property
     def player_id(self):
@@ -206,10 +215,13 @@ class Player:
         self._state.update(response)
 
         try:
+            del response['playlist_loop'][0]['duration']
             self._state.update(response['playlist_loop'][0])
         except KeyError:
             pass
+
         try:
+            del response['remoteMeta']['duration']
             self._state.update(response['remoteMeta'])
         except KeyError:
             pass

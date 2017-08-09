@@ -155,7 +155,7 @@ class Player:
         return '%s (%s:%s:%d%%): %s - %s (%3d%%: %s / %s)' % (
             self.name, self.model, self.ip, self.wifi_signal_strength,
             self.artist or '', self.title,
-            self.position / self.duration if self.duration else 0,
+            100 * self.position / self.duration if self.duration else 0,
             timeFmt(self.position),
             timeFmt(self.duration) if self.duration else '?')
 
@@ -225,21 +225,17 @@ class Player:
         if response is False:
             return
 
-        self._state.update(response)
-
         try:
-            del response['playlist_loop'][0]['duration']
             self._state.update(response['playlist_loop'][0])
         except KeyError:
             pass
 
         try:
-            del response['remoteMeta']['duration']
             self._state.update(response['remoteMeta'])
         except KeyError:
             pass
 
-        _LOGGER.debug('State: %s', self._state)
+        self._state.update(response)
 
     @property
     def track_id(self):

@@ -94,10 +94,9 @@ class Server:
             return {}
 
     def update(self):
-        self._state = self.query('serverstatus')
-        data = self.query('players', 'status')
+        self._state = self.server_status
         self._players = {player['playerid']: Player(self, player)
-                         for player in data['players_loop']}
+                         for player in self._state['players_loop']}
         self.update_players()
 
     def update_players(self):
@@ -119,6 +118,18 @@ class Server:
     @property
     def version(self):
         return self._state.get('version')
+
+    @property
+    def server_status(self):
+        return self.query('serverstatus', '-')
+
+    @property
+    def players_status(self):
+        return self.query('players', 'status')
+
+    @property
+    def favorites(self):
+        return self.query('favorites', 'items')
 
     @property
     def players(self):
@@ -193,7 +204,7 @@ class Player:
         return self._server.query(*params, player=self.player_id)
 
     def update(self):
-        tags = 'adKl'
+        tags = 'adKl'  # artist, duration, artwork, album
         response = self.query(
             'status', '-', '1', 'tags:{tags}'
             .format(tags=tags))

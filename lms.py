@@ -291,11 +291,11 @@ class Player:
     def set_volume(self, volume):
         return self.query('mixer', 'volume', volume)
 
-    def unmute(self, mute):
-        return self.query('mixer', 'muting', '0')
+    def mute(self, mute=True):
+        return self.query('mixer', 'muting', '1' if mute else '0')
 
-    def mute(self, mute):
-        return self.query('mixer', 'muting', '1')
+    def unmute(self):
+        return self.mute(False)
 
     def play(self):
         return self.query('play')

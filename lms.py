@@ -10,9 +10,10 @@ from sys import version_info, argv
 if version_info < (3, 0):
     exit('Python 3 required')
 
-__version__ = '0.0.6'
+__version__ = '0.0.10'
 
 _LOGGER = logging.getLogger(__name__)
+TIMEOUT = timedelta(seconds=5)
 
 
 def _discover():
@@ -21,7 +22,7 @@ def _discover():
     port = 3483
     query = b'eJSON\0'
     response = b'EJSON'
-    timeout = timedelta(seconds=5)
+    timeout = TIMEOUT
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -75,14 +76,13 @@ class Server:
 
     def query(self, *command, player=''):
         url = 'http://{}:{}/jsonrpc.js'.format(self._host, self._port)
-        data = {
-            'id': '1',
-            'method': 'slim.request',
-            'params': [player, command]
-        }
+        data = dict(id='1',
+                    method='slim.request',
+                    params=[player, command])
         _LOGGER.debug('URL: %s Data: %s', url, data)
         try:
-            result = self._session.post(url, json=data)
+            result = self._session.post(
+                url, json=data, timeout=TIMEOUT.seconds)
             result.raise_for_status()
             result = result.json()
             _LOGGER.debug(result)
@@ -92,10 +92,9 @@ class Server:
             return {}
 
     def update(self):
-        self._state = self.query('serverstatus')
-        data = self.query('players', 'status')
+        self._state = self.server_status
         self._players = {player['playerid']: Player(self, player)
-                         for player in data.get('players_loop', [])}
+                         for player in self._state['players_loop']}
         self.update_players()
 
     def update_players(self):
@@ -119,6 +118,18 @@ class Server:
         return self._state.get('version')
 
     @property
+    def server_status(self):
+        return self.query('serverstatus', '-')
+
+    @property
+    def players_status(self):
+        return self.query('players', 'status')
+
+    @property
+    def favorites(self):
+        return self.query('favorites', 'items')
+
+    @property
     def players(self):
         return self._players.values()
 
@@ -133,9 +144,18 @@ class Player:
         self._state = player
 
     def __str__(self):
-        return '%s (%s:%s:%d%%): %s - %s' % (
+
+        def timeFmt(s):
+            h, r = divmod(s, 3600)
+            m, s = divmod(r, 60)
+            return '%s%02d.%02d' % ('' if not h else '%02d:' % h, m, s)
+
+        return '%s (%s:%s:%d%%): %s - %s (%3d%%: %s / %s)' % (
             self.name, self.model, self.ip, self.wifi_signal_strength,
-            self.artist or '', self.title)
+            self.artist or '', self.title,
+            100 * self.position / self.duration if self.duration else 0,
+            timeFmt(self.position),
+            timeFmt(self.duration) if self.duration else '?')
 
     @property
     def player_id(self):
@@ -195,7 +215,7 @@ class Player:
         return self._server.query(*params, player=self.player_id)
 
     def update(self):
-        tags = 'adKl'
+        tags = 'adKl'  # artist, duration, artwork, album
         response = self.query(
             'status', '-', '1', 'tags:{tags}'
             .format(tags=tags))
@@ -203,31 +223,30 @@ class Player:
         if response is False:
             return
 
-        self._state.update(response)
-
         try:
             self._state.update(response['playlist_loop'][0])
         except KeyError:
             pass
+
         try:
             self._state.update(response['remoteMeta'])
         except KeyError:
             pass
 
-        _LOGGER.debug('State: %s', self._state)
+        self._state.update(response)
 
     @property
     def track_id(self):
         return self._state['id']
 
     @property
-    def volume_level(self):
+    def volume(self):
         if 'mixer volume' in self._state:
             return int(self._state['mixer volume'])
 
     @property
     def is_muted(self):
-        return self._state.get('mixer volume', '').startswith('-')
+        return str(self._state.get('mixer volume', '')).startswith('-')
 
     @property
     def position(self):
@@ -249,7 +268,7 @@ class Player:
         else:
             url = '/music/current/cover.jpg?player={player}'.format(
                 player=self.player_id)
-        return urljoin(self._server.url, url)
+        return urljoin(self._server._url, url)
 
     @property
     def title(self):
@@ -299,10 +318,10 @@ class Player:
     def turn_on(self):
         return self.query('power', '1')
 
-    def play(self, uri):
+    def play_uri(self, uri):
         return self.query('playlist', 'play', url)
 
-    def enqueue(self, uri):
+    def enqueue_uri(self, uri):
         return self.query('playlist', 'add', url)
 
     @property

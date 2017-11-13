@@ -9,5 +9,5 @@ print(server)
  - Livingroom (Squeezebox Boom:192.168.0.147:28468:80%)
  - Kitchen (Squeezebox Radio:192.168.0.15:44194:75%)
 ```
-  
-  
+
+Heavily influenced by the Home Assistant implementation of squeezebox.py.

@@ -10,4 +10,4 @@ print(server)
  - Kitchen (Squeezebox Radio:192.168.0.15:44194:75%)
 ```
 
-Heavily influenced by the Home Assistant implementation of squeezebox.py.
+Heavily influenced by the [Home Assistant](https://home-assistant.io/) implementation of [squeezebox.py](https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/media_player/squeezebox.py).

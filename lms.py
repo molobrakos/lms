@@ -75,6 +75,13 @@ class Server:
                 ' - ' + str(p) for p in self.players)
 
     def query(self, *command, player=''):
+
+        command = list(command)
+
+        if isinstance(command[-1], dict):
+            # handle tagged params
+            command.extend(map(lambda p: ':'.join(map(str, p)), command.pop().items()))
+
         url = 'http://{}:{}/jsonrpc.js'.format(self._host, self._port)
         data = dict(id='1',
                     method='slim.request',
@@ -131,7 +138,7 @@ class Server:
 
     @property
     def players(self):
-        return self._players.values()
+        return list(self._players.values())
 
     def player(self, player_id):
         return self._players[player_id]
@@ -334,4 +341,12 @@ if __name__ == '__main__':
     elif '-v' in argv:
         logging.basicConfig(level=logging.INFO)
     server = find_server()
-    print(server)
+
+    #print(server)
+    #from pprint import pprint
+    #print(server.query('can', 'spotty', 'items', '?'))
+    #player = server.players[0]
+    #pprint(player.query('spotty', 'items', 0, 255))
+    #print('---')
+    #pprint(player.query('spotty', 'items', 0, 255, dict(item_id=0, want_url=1)))
+    #pprint(player.query('spotty', 'items', 0, 255, dict(item_id='0.0', want_url=1, search='Queen')))

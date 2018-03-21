@@ -160,7 +160,7 @@ class Player:
         return '%s (%s:%s:%d%%): %s - %s (%3d%%: %s / %s)' % (
             self.name, self.model, self.ip, self.wifi_signal_strength,
             self.artist or '', self.title,
-            100 * self.position / self.duration if self.duration else 0,
+            self.position_pct,
             timeFmt(self.position),
             timeFmt(self.duration) if self.duration else '?')
 
@@ -259,6 +259,10 @@ class Player:
     def position(self):
         if 'time' in self._state:
             return int(float(self._state['time']))
+
+    @property
+    def position_pct(self):
+        return 100 * self.position / self.duration if self.duration else 0
 
     @property
     def duration(self):

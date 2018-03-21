@@ -10,8 +10,9 @@ setup(name='lms',
       py_modules=['lms'],
       url='https://github.com/molobrakos/lms',
       license="",
+      scripts=["lms"],
       author='',
       author_email='',
       install_requires=[
-          'requests'
+          'requests', 'docopt'
       ])

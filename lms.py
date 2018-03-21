@@ -80,7 +80,8 @@ class Server:
 
         if isinstance(command[-1], dict):
             # handle tagged params
-            command.extend(map(lambda p: ':'.join(map(str, p)), command.pop().items()))
+            command.extend(map(lambda p: ':'.join(map(str, p)),
+                               command.pop().items()))
 
         url = 'http://{}:{}/jsonrpc.js'.format(self._host, self._port)
         data = dict(id='1',
@@ -329,15 +330,16 @@ class Player:
     def turn_on(self):
         return self.query('power', '1')
 
-    def play_uri(self, uri):
+    def play_uri(self, url):
         return self.query('playlist', 'play', url)
 
-    def enqueue_uri(self, uri):
+    def enqueue_uri(self, url):
         return self.query('playlist', 'add', url)
 
     @property
     def wifi_signal_strength(self):
         return int(self._state.get('signalstrength'))
+
 
 if __name__ == '__main__':
     if '-vv' in argv:
@@ -346,11 +348,13 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.INFO)
     server = find_server()
 
-    #print(server)
-    #from pprint import pprint
-    #print(server.query('can', 'spotty', 'items', '?'))
-    #player = server.players[0]
-    #pprint(player.query('spotty', 'items', 0, 255))
-    #print('---')
-    #pprint(player.query('spotty', 'items', 0, 255, dict(item_id=0, want_url=1)))
-    #pprint(player.query('spotty', 'items', 0, 255, dict(item_id='0.0', want_url=1, search='Queen')))
+    # print(server)
+    # from pprint import pprint
+    # print(server.query('can', 'spotty', 'items', '?'))
+    # player = server.players[0]
+    # pprint(player.query('spotty', 'items', 0, 255))
+    # print('---')
+    # pprint(player.query('spotty', 'items', 0, 255,
+    # dict(item_id=0, want_url=1)))
+    # pprint(player.query('spotty', 'items', 0, 255,
+    # dict(item_id='0.0', want_url=1, search='Queen')))

@@ -74,7 +74,7 @@ class Server:
             self._host, self._port, self.version) + '\n' + '\n'.join(
                 ' - ' + str(p) for p in self.players)
 
-    def query(self, *command, player=''):
+    def query(self, player='', *command):
 
         command = list(command)
 

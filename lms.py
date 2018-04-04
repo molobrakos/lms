@@ -152,18 +152,10 @@ class Player:
         self._state = player
 
     def __str__(self):
-
-        def timeFmt(s):
-            h, r = divmod(s, 3600)
-            m, s = divmod(r, 60)
-            return '%s%02d.%02d' % ('' if not h else '%02d:' % h, m, s)
-
         return '%s (%s:%s:%d%%): %s - %s (%3d%%: %s / %s)' % (
             self.name, self.model, self.ip, self.wifi_signal_strength,
             self.artist or '', self.title,
-            self.position_pct,
-            timeFmt(self.position),
-            timeFmt(self.duration) if self.duration else '?')
+            self.position_pct)
 
     @property
     def player_id(self):
@@ -184,8 +176,16 @@ class Player:
         return self._state['name']
 
     @property
+    def address(self):
+        return self._state.get('player_ip').split(':')
+
+    @property
     def ip(self):
-        return self._state.get('player_ip')
+        return self.address[0]
+
+    @property
+    def port(self):
+        return self.address[1]
 
     @property
     def model(self):

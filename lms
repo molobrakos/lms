@@ -31,6 +31,12 @@ LOGFMT = "%(asctime)s %(levelname)5s (%(threadName)s) [%(name)s] %(message)s"
 DATEFMT = "%y-%m-%d %H:%M.%S"
 
 
+def timeFmt(secs):
+    h, r = divmod(secs, 3600)
+    m, secs = divmod(r, 60)
+    return '%s%02d.%02d' % ('' if not h else '%02d:' % h, m, secs)
+
+
 def main():
     """Command line interface."""
     args = docopt.docopt(__doc__,
@@ -63,9 +69,18 @@ def main():
               if player_id else None)
 
     if args['status']:
-        print(server)
+        print(f'{server._host}:{server._port} ({server.version})')
+        for player in server.players:
+            print(f'- {player.name:10} {player.model:16} '
+                  f'{player.ip:15} 📶{player.wifi_signal_strength:>4}% '
+                  f'{"playing" if player.is_playing else "paused" if player.is_paused else "stopped" if player.is_stopped else "?":7} '
+                  f'{(player.artist or "")[:10]:10} {player.title[:10]:10} '
+                  f'{timeFmt(player.position)}/'
+                  f'{timeFmt(player.duration) or "?"} '
+                  f'({round(player.position_pct):3}%)')
+
     elif player:
-        if args['<track>']: 
+        if args['<track>']:
             if args['play']:
                 pass
             elif args['add']:

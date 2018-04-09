@@ -24,6 +24,7 @@ from json import dumps as to_json
 from sys import stderr
 from collections import OrderedDict
 from lms import find_server, __version__
+from re import match
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,6 +33,8 @@ DATEFMT = "%y-%m-%d %H:%M.%S"
 
 
 def timeFmt(secs):
+    if not secs:
+        return ''
     h, r = divmod(secs, 3600)
     m, secs = divmod(r, 60)
     return '%s%02d.%02d' % ('' if not h else '%02d:' % h, m, secs)
@@ -68,23 +71,40 @@ def main():
                 player.ip]), None)
               if player_id else None)
 
+    if args['<track>']:
+        if 'spotify' in args['<track>'] and not server.can('spotty'):
+            exit('Spotty not supported by server')
+        m = match('https://open.spotify.com/(track|album|playlist)/([0-9a-zA-Z]*)', args['<track>'])
+        if m:
+            args['<track>'] = 'spotify:%s:%s' % m.groups()
+
     if args['status']:
         print(f'{server._host}:{server._port} ({server.version})')
         for player in server.players:
+            if player.is_playing:
+                status = 'playing'
+            elif player.is_paused:
+                status = 'paused'
+            elif player.is_stopped:
+                status = 'stopped'
+            else:
+                status = '?'
             print(f'- {player.name:10} {player.model:16} '
                   f'{player.ip:15} 📶{player.wifi_signal_strength:>4}% '
-                  f'{"playing" if player.is_playing else "paused" if player.is_paused else "stopped" if player.is_stopped else "?":7} '
-                  f'{(player.artist or "")[:10]:10} {player.title[:10]:10} '
-                  f'{timeFmt(player.position)}/'
-                  f'{timeFmt(player.duration) or "?"} '
-                  f'({round(player.position_pct):3}%)')
+                  f'{status:7} '
+                  f'{(player.artist or "")[:10]:10} {(player.title or "")[:10]:10} '
+                  f'{round(player.position_pct):3}% '
+                  f'{timeFmt(player.position) or "     "}/'
+                  f'{timeFmt(player.duration) or "     "} ')
 
+    #    url='https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC'
+    #    server.players[0].query('playlist', 'play', url)
     elif player:
         if args['<track>']:
             if args['play']:
-                pass
+                player.play_uri(args['<track>'])
             elif args['add']:
-                pass
+                player.add_uri(args['<track>'])
         elif args['play']:
             player.play()
         elif args['pause']:

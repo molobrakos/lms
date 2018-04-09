@@ -50,6 +50,7 @@ def find_server():
     server.update()
     return server
 
+# FIXME: Support async/await
 
 class Server:
 
@@ -74,14 +75,14 @@ class Server:
             self._host, self._port, self.version) + '\n' + '\n'.join(
                 ' - ' + str(p) for p in self.players)
 
-    def query(self, *command, player=''):
+    def query(self, *command, **kwparams):
 
         command = list(command)
+        player = kwparams.pop('player', '')
 
-        if isinstance(command[-1], dict):
-            # handle tagged params
-            command.extend(map(lambda p: ':'.join(map(str, p)),
-                               command.pop().items()))
+        # handle tagged params
+        command.extend(map(lambda p: ':'.join(map(str, p)),
+                           kwparams.items()))
 
         url = 'http://{}:{}/jsonrpc.js'.format(self._host, self._port)
         data = dict(id='1',
@@ -108,6 +109,9 @@ class Server:
     def update_players(self):
         for player in self.players:
             player.update()
+
+    def can(self, what):
+        return self.players[0].can(what)
 
     @property
     def _url(self):
@@ -219,8 +223,11 @@ class Player:
     def is_repeat(self):
         return self._state.get('playlist_repeat') == 1
 
-    def query(self, *params):
-        return self._server.query(*params, player=self.player_id)
+    def can(self, what):
+        return self.query('can', what, 'items', '?')
+
+    def query(self, *params, **kwparams):
+        return self._server.query(*params, **kwparams, player=self.player_id)
 
     def update(self):
         tags = 'adKl'  # artist, duration, artwork, album

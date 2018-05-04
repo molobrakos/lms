@@ -45,11 +45,6 @@ def _discover():
     return None, None
 
 
-def find_server():
-    server = Server()
-    server.update()
-    return server
-
 # FIXME: Support async/await
 
 class Server:
@@ -353,7 +348,7 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG)
     elif '-v' in argv:
         logging.basicConfig(level=logging.INFO)
-    server = find_server()
+    server = Server()
 
     # print(server)
     # from pprint import pprint

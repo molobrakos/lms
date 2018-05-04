@@ -12,6 +12,7 @@ Usage:
   lms [-v|-vv] [options] <player> volume (up | down | <vol>)
 
 Options:
+  -H <ip>               Host
   -h --help             Show this message
   -v,-vv                Increase verbosity
   --version             Show version
@@ -23,7 +24,7 @@ from time import time
 from json import dumps as to_json
 from sys import stderr
 from collections import OrderedDict
-from lms import find_server, __version__
+from lms import Server, __version__
 from re import match
 
 _LOGGER = logging.getLogger(__name__)
@@ -60,7 +61,8 @@ def main():
                             datefmt=DATEFMT,
                             format=LOGFMT)
 
-    server = find_server()
+    server = Server(args['-H'])
+    server.update()
 
     player_id = args['<player>']
     player = (next((

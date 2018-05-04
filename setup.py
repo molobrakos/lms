@@ -13,6 +13,6 @@ setup(name='lms',
       scripts=["lms"],
       author='',
       author_email='',
-      install_requires=[
-          'requests', 'docopt'
-      ])
+      install_requires=list(
+          open('requirements.txt').read().strip().split('\n')),
+)

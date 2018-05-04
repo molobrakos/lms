@@ -97,11 +97,10 @@ class Server:
 
     def update(self):
         self._state = self.server_status
-        if not self._state:
-            return
-        self._players = {player['playerid']: Player(self, player)
-                         for player in self._state['players_loop']}
-        self.update_players()
+        if self._state:
+            self._players = {player['playerid']: Player(self, player)
+                             for player in self._state['players_loop']}
+            self.update_players()
 
     def update_players(self):
         for player in self.players:

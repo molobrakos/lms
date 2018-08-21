@@ -14,5 +14,4 @@ setup(name='lms',
       author='',
       author_email='',
       install_requires=list(
-          open('requirements.txt').read().strip().split('\n')),
-)
+          open('requirements.txt').read().strip().split()))

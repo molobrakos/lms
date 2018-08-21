@@ -155,7 +155,8 @@ class Player:
         return '%s (%s:%s:%d%%): %s - %s (%3d%%: %s / %s)' % (
             self.name, self.model, self.ip, self.wifi_signal_strength,
             self.artist or '', self.title,
-            self.position_pct)
+            self.position_pct,
+            self.position, self.duration)
 
     @property
     def player_id(self):

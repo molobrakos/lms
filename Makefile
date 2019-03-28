@@ -1,0 +1,2 @@
+default:
+	tox -e lint

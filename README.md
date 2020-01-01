@@ -1,8 +1,9 @@
 Python interface with the squeezebox server using json-rpc
 
 ```
-from lms import find_server
-server = find_server()
+from lms import Server
+server = Server()
+server.update()
 print(server)
 
 192.168.0.81:9000 (7.9.0)

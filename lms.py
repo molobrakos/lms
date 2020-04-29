@@ -179,7 +179,7 @@ class Player:
 
     @property
     def address(self):
-        return self._state.get('player_ip').split(':')
+        return self._state.get('player_ip', "IP unkown").split(':')
 
     @property
     def ip(self):

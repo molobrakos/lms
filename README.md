@@ -7,8 +7,8 @@ server.update()
 print(server)
 
 192.168.0.81:9000 (7.9.0)
- - Livingroom (Squeezebox Boom:192.168.0.147:28468:80%)
- - Kitchen (Squeezebox Radio:192.168.0.15:44194:75%)
+ - Livingroom (bb:bb:c1:92:49:c0 Squeezebox Boom:192.168.0.147:28468 80%):  -  (  0%: 0 / 0)
+ - Kitchen (b2:27:ec:23:ba:34 Squeezebox Radio:192.168.0.15:44194 75%): Westbam/ML - We're from Uptown ( 73%: 224 / 303)
 ```
 
 ```
